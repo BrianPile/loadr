@@ -18,3 +18,5 @@ Imports:
     rlang,
     stringr,
     tibble
+URL: https://github.com/BrianPile/loadr
+BugReports: https://github.com/BrianPile/loadr/issues
