@@ -1,21 +1,39 @@
+#' Load LIV files
+#'
+#' @param file Path to an LIV data file.
+#'
+#' @returns A data frame
+#' @export
+#' @importFrom rlang .data
+#'
+#' @examples
+#' filepath <- system.file("extdata",
+#'    "DT7_25FC01497-CF5_B4_C6-CH1-Front-Pad-Stage_500mA_50C_NAV_00_LIV.xlsx",
+#'    package = "loadr")
+#' if (file.exists(filepath)) {
+#'   df <- load_liv(filepath)
+#'   head(df)
+#' }
+
+
 load_liv = function(file) {
 
   # determine the test station
-  if (str_detect(file, "_LIV[.]xlsx$")) {
+  if (stringr::str_detect(file, "_LIV[.]xlsx$")) {
     test_station = "MOIV1"
-  } else if (str_detect(file, "_LIV[.]csv$")) {
+  } else if (stringr::str_detect(file, "_LIV[.]csv$")) {
     test_station = "MOIV3"
   } else {
     test_station = "???"
   }
 
   # extract dut info from file name
-  work_order = str_extract(file, "WO\\d{2}-\\d{4}")
-  fc_id = str_extract(file, "\\d{2}FC\\d{5}")
-  ch = str_extract(file, "CH([1-4])", group = 1)
+  work_order = stringr::str_extract(file, "WO\\d{2}-\\d{4}")
+  fc_id = stringr::str_extract(file, "\\d{2}FC\\d{5}")
+  ch = stringr::str_extract(file, "CH([1-4])", group = 1)
   dut_id = paste(sep = "-", fc_id, ch)
-  test_id = str_extract(file, "_(\\d{2})_LIV", group = 1)
-  temperature = str_extract(file, "_(\\d{2})[.]?\\dC?", group = 1)
+  test_id = stringr::str_extract(file, "_(\\d{2})_LIV", group = 1)
+  temperature = stringr::str_extract(file, "_(\\d{2})[.]?\\dC?", group = 1)
 
   # read data
   if (test_station == "MOIV1") {
@@ -27,19 +45,19 @@ load_liv = function(file) {
 
     # select and rename columns
     df = df |>
-      select(
-        current = `I/mA`,
-        power = `P/mW`,
-        voltage = `V/V`,
-        mpd_current = `Ch2I/mA`
+      dplyr::select(
+        current = .data$`I/mA`,
+        power = .data$`P/mW`,
+        voltage = .data$`V/V`,
+        mpd_current = .data$`Ch2I/mA`
       )
 
     # convert to SI units
     df = df |>
-      mutate(
-        current = current * 1e-3,
-        power = power * 1e-3,
-        mpd_current = mpd_current * 1e-3
+      dplyr::mutate(
+        current = .data$current * 1e-3,
+        power = .data$power * 1e-3,
+        mpd_current = .data$mpd_current * 1e-3
       )
   } else if (test_station == "MOIV3") {
 
@@ -47,29 +65,29 @@ load_liv = function(file) {
       file = file,
       skip = 12
     ) |>
-      as_tibble()
+      tibble::as_tibble()
 
     # select and rename columns
     df = df |>
-      select(
-        current = `set_current[mA]`,
-        power = `power[mW]`,
-        voltage = `voltage[V]`,
+      dplyr::select(
+        current = .data$`set_current[mA]`,
+        power = .data$`power[mW]`,
+        voltage = .data$`voltage[V]`,
       ) |>
-      mutate(mpd_current = 0) # MOIV3 does not have MPD capability?
+      dplyr::mutate(mpd_current = 0) # MOIV3 does not have MPD capability?
 
     # convert to SI units
     df = df |>
-      mutate(
-        current = current * 1e-3,
-        power = power * 1e-3
+      dplyr::mutate(
+        current = .data$current * 1e-3,
+        power = .data$power * 1e-3
       )
   }
 
 
   # add dut info
   df = df |>
-    mutate(
+    dplyr::mutate(
       work_order = work_order,
       test_station = test_station,
       fc_id = fc_id,
@@ -77,7 +95,7 @@ load_liv = function(file) {
       dut_id = dut_id,
       test_id = test_id,
       temperature = temperature,
-      .before = current
+      .before = .data$current
     )
 
   return(df)
