@@ -2,4 +2,5 @@
 
 export(load_iv)
 export(load_liv)
+export(load_osa)
 importFrom(rlang,.data)
