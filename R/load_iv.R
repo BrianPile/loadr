@@ -23,7 +23,7 @@ load_iv = function(file) {
   work_order = stringr::str_extract(file, "WO\\d{2}-\\d{4}")
   fc_id = stringr::str_extract(file, "\\d{2}FC\\d{4,5}")
   ch = stringr::str_extract(file, "CH([1-4])", group = 1)
-  dut_id = paste(sep = "-", fc_id, ch)
+  # dut_id = paste(sep = "-", fc_id, ch)
   test_id = stringr::str_extract(file, "_(\\d{2})_LIV", group = 1)
   temperature = stringr::str_extract(file, "_(\\d{2})[.]?\\dC?", group = 1)
 
@@ -48,7 +48,7 @@ load_iv = function(file) {
       test_station = test_station,
       fc_id = fc_id,
       ch = ch,
-      dut_id = dut_id,
+      # dut_id = dut_id,
       test_id = test_id,
       temperature = temperature,
       .before = .data$current
