@@ -33,7 +33,7 @@ load_osa = function(file) {
   ch = stringr::str_extract(file, "CH([1-4])", group = 1)
   # dut_id = paste(sep = "-", fc_id, ch)
   test_id = stringr::str_extract(file, "_(\\d{2})_OSA", group = 1)
-  temperature = stringr::str_extract(file, "_(\\d{2})[.]?\\dC?", group = 1)
+  temperature = stringr::str_extract(file, "_(\\d{2})[.]?\\d?C_", group = 1)
   If = stringr::str_extract(file, "(\\d{1,3})mA", group = 1) |> as.numeric() * 1e-3
 
   # read data
