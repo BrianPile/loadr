@@ -34,7 +34,7 @@ load_osa = function(file) {
   # dut_id = paste(sep = "-", fc_id, ch)
   test_id = stringr::str_extract(file, "_(\\d{2})_OSA", group = 1)
   temperature = stringr::str_extract(file, "_(\\d{2})[.]?\\d?C_", group = 1)
-  If = stringr::str_extract(file, "(\\d{1,3})mA", group = 1) |> as.numeric() * 1e-3
+  If = stringr::str_extract(file, "_(\\d{2,3})[.]?\\d?\\d?mA_", group = 1) |> as.numeric() * 1e-3
 
   # read data
   if (test_station == "MOIV1") {
@@ -56,24 +56,21 @@ load_osa = function(file) {
 
     df = data.table::fread(
       file = file,
-      skip = 12
+      skip = 21
     ) |>
       tibble::as_tibble()
 
     # select and rename columns
     df = df |>
       dplyr::select(
-        current = .data$`set_current[mA]`,
-        power = .data$`power[mW]`,
-        voltage = .data$`voltage[V]`,
-      ) |>
-      dplyr::mutate(mpd_current = 0) # MOIV3 does not have MPD capability?
+        wavelength = .data$`wavelength[m]`,
+        power = .data$`level[dBm]`
+      )
 
-    # convert to SI units
+    # convert to preferred units
     df = df |>
       dplyr::mutate(
-        current = .data$current * 1e-3,
-        power = .data$power * 1e-3
+        wavelength = .data$wavelength / 1e-9
       )
   }
 
@@ -84,7 +81,6 @@ load_osa = function(file) {
       test_station = test_station,
       fc_id = fc_id,
       ch = ch,
-      # dut_id = dut_id,
       test_id = test_id,
       temperature = temperature,
       If = If,
