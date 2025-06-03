@@ -6,7 +6,7 @@
 #'
 #' @examples
 
-.get_test_info = function(file) {
+.liv_get_test_info = function(file) {
 
   # determine the test station
   if (stringr::str_detect(file, "_LIV[.]xlsx$")) {
@@ -64,7 +64,7 @@
 load_liv = function(file) {
 
   # get test info
-  df_info = .get_test_info(file)
+  df_info = .liv_get_test_info(file)
 
   # read data
   if (df_info$test_station == "MOIV1") {
