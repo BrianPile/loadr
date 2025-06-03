@@ -1,3 +1,60 @@
+#' Get test info from the OSA filename
+#'
+#' @param file Path to an OSA data file.
+#'
+#' @returns A single row data frame
+#'
+#' @examples
+
+.osa_get_test_info = function(file) {
+
+  # determine the test station
+  if (stringr::str_detect(file, "_OSA[.]xlsx$")) {
+    test_station = "MOIV1"
+  } else if (stringr::str_detect(file, "_OSA[.]csv$")) {
+    test_station = "MOIV3"
+  } else if (stringr::str_detect(file, "-OSA[.]csv$")) {
+    test_station = "ETS01"
+  } else {
+    test_station = "???"
+    stop("Could not determine the test station from the file name!")
+  }
+
+  # extract test info from file name and put in a data frame
+  df_cond = tibble::tibble(
+    work_order = stringr::str_extract(file, "WO\\d{2}-\\d{4}"),
+    test_station = test_station,
+    fc_id = dplyr::case_when(
+      test_station == "ETS01" ~ stringr::str_extract(basename(file), "^([^-]+-[^-]+-[^-]+-[^-]+).*[.]csv", group = 1),
+      .default = stringr::str_extract(file, "\\d{2}FC\\d{5}")
+    ),
+    ch = stringr::str_extract(file, "CH([1-4])", group = 1),
+    temperature = dplyr::case_when(
+      test_station == "ETS01" ~ stringr::str_extract(file, "-(\\d{2})[.]?\\d?C-", group = 1),
+      .default = stringr::str_extract(file, "_(\\d{2})[.]?\\dC?", group = 1),
+    ),
+    If = stringr::str_extract(file, "[-_](\\d{2,3})[.]?\\d?\\d?mA[-_]", group = 1) |> as.numeric() * 1e-3,
+    test_id = dplyr::case_when(
+      test_station == "ETS01" ~ stringr::str_extract(file, "-(\\d{2})-OSA", group = 1),
+      .default = stringr::str_extract(file, "_(\\d{2})_LIV", group = 1),
+    )
+  )
+
+
+
+
+  # # extract dut info from file name
+  # work_order = stringr::str_extract(file, "WO\\d{2}-\\d{4}")
+  # fc_id = stringr::str_extract(file, "\\d{2}FC\\d{5}")
+  # ch = stringr::str_extract(file, "CH([1-4])", group = 1)
+  # test_id = stringr::str_extract(file, "_(\\d{2})_OSA", group = 1)
+  # temperature = stringr::str_extract(file, "_(\\d{2})[.]?\\d?C_", group = 1)
+
+  return(df_cond)
+
+}
+
+
 #' Load OSA files
 #'
 #' @param file Path to the OSA file
@@ -18,26 +75,11 @@
 
 load_osa = function(file) {
 
-  # determine the test station
-  if (stringr::str_detect(file, "_OSA[.]xlsx$")) {
-    test_station = "MOIV1"
-  } else if (stringr::str_detect(file, "_OSA[.]csv$")) {
-    test_station = "MOIV3"
-  } else {
-    test_station = "???"
-  }
-
-  # extract dut info from file name
-  work_order = stringr::str_extract(file, "WO\\d{2}-\\d{4}")
-  fc_id = stringr::str_extract(file, "\\d{2}FC\\d{5}")
-  ch = stringr::str_extract(file, "CH([1-4])", group = 1)
-  # dut_id = paste(sep = "-", fc_id, ch)
-  test_id = stringr::str_extract(file, "_(\\d{2})_OSA", group = 1)
-  temperature = stringr::str_extract(file, "_(\\d{2})[.]?\\d?C_", group = 1)
-  If = stringr::str_extract(file, "_(\\d{2,3})[.]?\\d?\\d?mA_", group = 1) |> as.numeric() * 1e-3
+  # get test info
+  df_info = .osa_get_test_info(file)
 
   # read data
-  if (test_station == "MOIV1") {
+  if (df_info$test_station == "MOIV1") {
 
     df = readxl::read_excel(
       path = file,
@@ -52,7 +94,7 @@ load_osa = function(file) {
         power = .data$dBm,
       )
 
-  } else if (test_station == "MOIV3") {
+  } else if (df_info$test_station == "MOIV3") {
 
     df = data.table::fread(
       file = file,
@@ -72,20 +114,22 @@ load_osa = function(file) {
       dplyr::mutate(
         wavelength = .data$wavelength / 1e-9
       )
+  } else if (df_info$test_station == "ETS01") {
+
+    df = data.table::fread(file) |>
+      tibble::as_tibble()
+
+    # select and rename columns
+    df = df |>
+      dplyr::select(
+        wavelength = .data$`wavelength[nm]`,
+        power = .data$`power[dBm]`,
+      )
+
   }
 
-  # add dut info
-  df = df |>
-    dplyr::mutate(
-      work_order = work_order,
-      test_station = test_station,
-      fc_id = fc_id,
-      ch = ch,
-      test_id = test_id,
-      temperature = temperature,
-      If = If,
-      .before = .data$wavelength
-    )
+  # combine columns of test info data & measurement data
+  df = dplyr::bind_cols(df_info, df)
 
   return(df)
 
