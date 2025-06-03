@@ -1,3 +1,49 @@
+#' Get test info from the filename
+#'
+#' @param file Path to an LIV data file.
+#'
+#' @returns A single row data frame
+#'
+#' @examples
+
+.get_test_info = function(file) {
+
+  # determine the test station
+  if (stringr::str_detect(file, "_LIV[.]xlsx$")) {
+    test_station = "MOIV1"
+  } else if (stringr::str_detect(file, "_LIV[.]csv$")) {
+    test_station = "MOIV3"
+  } else if (stringr::str_detect(file, "-LIV[.]csv$")) {
+    test_station = "ETS01"
+  } else {
+    test_station = "???"
+    stop("Could not determine the test station from the file name!")
+  }
+
+  # extract test info from file name and put in a data frame
+  df_cond = tibble::tibble(
+    work_order = stringr::str_extract(file, "WO\\d{2}-\\d{4}"),
+    test_station = test_station,
+    fc_id = dplyr::case_when(
+      test_station == "ETS01" ~ stringr::str_extract(basename(file), "^([^-]+-[^-]+-[^-]+-[^-]+).*[.]csv", group = 1),
+      .default = stringr::str_extract(file, "\\d{2}FC\\d{5}")
+    ),
+    ch = stringr::str_extract(file, "CH([1-4])", group = 1),
+    test_id = dplyr::case_when(
+      test_station == "ETS01" ~ stringr::str_extract(file, "-(\\d{2})-LIV", group = 1),
+      .default = stringr::str_extract(file, "_(\\d{2})_LIV", group = 1),
+    ),
+    temperature = dplyr::case_when(
+      test_station == "ETS01" ~ stringr::str_extract(file, "-(\\d{2})[.]?\\d?C-", group = 1),
+      .default = stringr::str_extract(file, "_(\\d{2})[.]?\\dC?", group = 1),
+    )
+  )
+
+  return(df_cond)
+
+}
+
+
 #' Load LIV files
 #'
 #' @param file Path to an LIV data file.
@@ -15,28 +61,13 @@
 #'   head(df)
 #' }
 
-
 load_liv = function(file) {
 
-  # determine the test station
-  if (stringr::str_detect(file, "_LIV[.]xlsx$")) {
-    test_station = "MOIV1"
-  } else if (stringr::str_detect(file, "_LIV[.]csv$")) {
-    test_station = "MOIV3"
-  } else {
-    test_station = "???"
-  }
-
-  # extract dut info from file name
-  work_order = stringr::str_extract(file, "WO\\d{2}-\\d{4}")
-  fc_id = stringr::str_extract(file, "\\d{2}FC\\d{5}")
-  ch = stringr::str_extract(file, "CH([1-4])", group = 1)
-  # dut_id = paste(sep = "-", fc_id, ch)
-  test_id = stringr::str_extract(file, "_(\\d{2})_LIV", group = 1)
-  temperature = stringr::str_extract(file, "_(\\d{2})[.]?\\dC?", group = 1)
+  # get test info
+  df_info = .get_test_info(file)
 
   # read data
-  if (test_station == "MOIV1") {
+  if (df_info$test_station == "MOIV1") {
 
     df = readxl::read_excel(
       path = file,
@@ -58,8 +89,9 @@ load_liv = function(file) {
         current = .data$current * 1e-3,
         power = .data$power * 1e-3,
         mpd_current = .data$mpd_current * 1e-3
+
       )
-  } else if (test_station == "MOIV3") {
+  } else if (df_info$test_station == "MOIV3") {
 
     df = data.table::fread(
       file = file,
@@ -82,21 +114,32 @@ load_liv = function(file) {
         current = .data$current * 1e-3,
         power = .data$power * 1e-3
       )
+  } else if (df_info$test_station == "ETS01") {
+
+    df = data.table::fread(file) |>
+      tibble::as_tibble()
+
+    # select and rename columns
+    df = df |>
+      dplyr::select(
+        current = .data$`current[mA]`,
+        power = .data$`power[mW]`,
+        voltage = .data$`voltage[V]`,
+        mpd_current = .data$`mpd_current[mA]`
+      )
+
+    # convert to SI units
+    df = df |>
+      dplyr::mutate(
+        current = .data$current * 1e-3,
+        power = .data$power * 1e-3,
+        mpd_current = .data$mpd_current * 1e-3
+      )
+
   }
 
-
-  # add dut info
-  df = df |>
-    dplyr::mutate(
-      work_order = work_order,
-      test_station = test_station,
-      fc_id = fc_id,
-      ch = ch,
-      # dut_id = dut_id,
-      test_id = test_id,
-      temperature = temperature,
-      .before = .data$current
-    )
+  # combine columns of test info data & measurement data
+  df = dplyr::bind_cols(df_info, df)
 
   return(df)
 
