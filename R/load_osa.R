@@ -36,7 +36,7 @@
     If = stringr::str_extract(file, "[-_](\\d{2,3})[.]?\\d?\\d?mA[-_]", group = 1) |> as.numeric() * 1e-3,
     test_id = dplyr::case_when(
       test_station == "ETS01" ~ stringr::str_extract(file, "-(\\d{2})-OSA", group = 1),
-      .default = stringr::str_extract(file, "_(\\d{2})_LIV", group = 1),
+      .default = stringr::str_extract(file, "_(\\d{2})_OSA", group = 1),
     )
   )
 
