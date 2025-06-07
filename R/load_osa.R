@@ -31,7 +31,7 @@
     ch = stringr::str_extract(file, "CH([1-4])", group = 1),
     temperature = dplyr::case_when(
       test_station == "ETS01" ~ stringr::str_extract(file, "-(\\d{2})[.]?\\d?C-", group = 1),
-      .default = stringr::str_extract(file, "_(\\d{2})[.]?\\dC?", group = 1),
+      .default = stringr::str_extract(file, "_(\\d{2})[.]?\\d?C", group = 1),
     ),
     If = stringr::str_extract(file, "[-_](\\d{2,3})[.]?\\d?\\d?mA[-_]", group = 1) |> as.numeric() * 1e-3,
     test_id = dplyr::case_when(
