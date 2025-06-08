@@ -24,8 +24,8 @@ load_iv = function(file) {
   fc_id = stringr::str_extract(file, "\\d{2}FC\\d{4,5}")
   ch = stringr::str_extract(file, "CH([1-4])", group = 1)
   # dut_id = paste(sep = "-", fc_id, ch)
-  test_id = stringr::str_extract(file, "_(\\d{2})_LIV", group = 1)
   temperature = stringr::str_extract(file, "_(\\d{2})[.]?\\dC?", group = 1)
+  test_id = stringr::str_extract(file, "_(\\d{2})_LIV", group = 1)
 
   # read data
   df = data.table::fread(
@@ -48,9 +48,8 @@ load_iv = function(file) {
       test_station = test_station,
       fc_id = fc_id,
       ch = ch,
-      # dut_id = dut_id,
-      test_id = test_id,
       temperature = temperature,
+      test_id = test_id,
       .before = .data$current
     )
 

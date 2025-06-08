@@ -2,16 +2,16 @@
 % Please edit documentation in R/load_osa.R
 \name{.osa_get_test_info}
 \alias{.osa_get_test_info}
-\title{Get test info from the filename}
+\title{Get test info from the OSA filename}
 \usage{
 .osa_get_test_info(file)
 }
 \arguments{
-\item{file}{Path to an LIV data file.}
+\item{file}{Path to an OSA data file.}
 }
 \value{
 A single row data frame
 }
 \description{
-Get test info from the filename
+Get test info from the OSA filename
 }
