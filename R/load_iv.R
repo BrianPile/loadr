@@ -21,16 +21,23 @@ load_iv = function(file) {
 
   # extract dut info from file name
   work_order = stringr::str_extract(file, "WO\\d{2}-\\d{4}")
-  fc_id = stringr::str_extract(file, "\\d{2}FC\\d{4,5}")
+  fc_id = stringr::str_extract(file, "\\d{2}FC\\d{1,5}")
+  fc_numeric = stringr::str_remove(fc_id, "^\\d{2}FC") |> readr::parse_number()
+  fc_char = sprintf(fmt = "%05d", fc_numeric)
+  fc_id = paste0("25FC", fc_char)
   ch = stringr::str_extract(file, "CH([1-4])", group = 1)
   # dut_id = paste(sep = "-", fc_id, ch)
   temperature = stringr::str_extract(file, "_(\\d{2})[.]?\\dC?", group = 1)
   test_id = stringr::str_extract(file, "_(\\d{2})_LIV", group = 1)
 
+  # detect header
+  lines = readr::read_lines(file, n_max = 10)
+  header_line = which(stringr::str_detect(lines, "Vanodf"))
+
   # read data
   df = data.table::fread(
     file = file,
-    skip = 1
+    skip = header_line -1
   ) |>
     tibble::as_tibble()
 
