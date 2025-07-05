@@ -17,7 +17,7 @@
     test_station = "ETS01"
   } else {
     test_station = "???"
-    stop("Could not determine the test station from the file name!")
+    stop("Could not determine the LIV test station from the file name!")
   }
 
   # extract test info from file name and put in a data frame
@@ -34,7 +34,7 @@
       .default = stringr::str_extract(file, "_(\\d{2})[.]?\\dC?", group = 1),
     ),
     test_id = dplyr::case_when(
-      test_station == "ETS01" ~ stringr::str_extract(file, "-(\\d{2})-LIV", group = 1),
+      test_station == "ETS01" ~ stringr::str_extract(file, "(?<=-)([0-9]{2}(?:_.*)?)(?=-)-LIV[.]csv$", group = 1),
       .default = stringr::str_extract(file, "_(\\d{2})_LIV", group = 1),
     )
   )
@@ -139,7 +139,11 @@ load_liv = function(file) {
   }
 
   # combine columns of test info data & measurement data
-  df = dplyr::bind_cols(df_info, df)
+  df = dplyr::bind_cols(df_info, df) |>
+    dplyr::rename(
+      test_station_liv = .data$test_station,
+      test_id_liv = .data$test_id
+    )
 
   return(df)
 

@@ -17,7 +17,7 @@
 load_iv = function(file) {
 
   # determine the test station (unclear from file names / content)
-  test_station = NA
+  test_station = "?"
 
   # extract dut info from file name
   work_order = stringr::str_extract(file, "WO\\d{2}-\\d{4}")
@@ -52,11 +52,11 @@ load_iv = function(file) {
   df = df |>
     dplyr::mutate(
       work_order = work_order,
-      test_station = test_station,
+      test_station_iv = test_station,
       fc_id = fc_id,
       ch = ch,
       temperature = temperature,
-      test_id = test_id,
+      test_id_iv = test_id,
       .before = .data$current
     )
 

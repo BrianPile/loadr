@@ -17,7 +17,7 @@
     test_station = "ETS01"
   } else {
     test_station = "???"
-    stop("Could not determine the test station from the file name!")
+    stop("Could not determine the OSA test station from the file name!")
   }
 
   # extract test info from file name and put in a data frame
@@ -35,20 +35,10 @@
     ),
     If = stringr::str_extract(file, "[-_](\\d{2,3})[.]?\\d?\\d?mA[-_]", group = 1) |> as.numeric() * 1e-3,
     test_id = dplyr::case_when(
-      test_station == "ETS01" ~ stringr::str_extract(file, "-(\\d{2})-OSA", group = 1),
+      test_station == "ETS01" ~ stringr::str_extract(file, "(?<=-)([0-9]{2}(?:_.*)?)(?=-)-OSA[.]csv$", group = 1),
       .default = stringr::str_extract(file, "_(\\d{2})_OSA", group = 1),
     )
   )
-
-
-
-
-  # # extract dut info from file name
-  # work_order = stringr::str_extract(file, "WO\\d{2}-\\d{4}")
-  # fc_id = stringr::str_extract(file, "\\d{2}FC\\d{5}")
-  # ch = stringr::str_extract(file, "CH([1-4])", group = 1)
-  # test_id = stringr::str_extract(file, "_(\\d{2})_OSA", group = 1)
-  # temperature = stringr::str_extract(file, "_(\\d{2})[.]?\\d?C_", group = 1)
 
   return(df_cond)
 
@@ -129,7 +119,11 @@ load_osa = function(file) {
   }
 
   # combine columns of test info data & measurement data
-  df = dplyr::bind_cols(df_info, df)
+  df = dplyr::bind_cols(df_info, df) |>
+    dplyr::rename(
+      test_station_osa = .data$test_station,
+      test_id_osa = .data$test_id
+    )
 
   return(df)
 
