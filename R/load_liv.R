@@ -28,7 +28,7 @@
       test_station == "ETS01" ~ stringr::str_extract(basename(file), "^([^-]+-[^-]+-[^-]+-[^-]+).*[.]csv", group = 1),
       .default = stringr::str_extract(file, "\\d{2}FC\\d{5}")
     ),
-    ch = stringr::str_extract(file, "CH([1-4])", group = 1),
+    ch = stringr::str_extract(file, "CH([1-8])", group = 1),
     temperature = dplyr::case_when(
       test_station == "ETS01" ~ stringr::str_extract(file, "-(\\d{2})[.]?\\d?C-", group = 1),
       test_station == "MOIV3" ~ stringr::str_extract(file, "_(\\d{2}).\\dC", group = 1),
