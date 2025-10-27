@@ -31,6 +31,7 @@
     ch = stringr::str_extract(file, "CH([1-4])", group = 1),
     temperature = dplyr::case_when(
       test_station == "ETS01" ~ stringr::str_extract(file, "-(\\d{2})[.]?\\d?C-", group = 1),
+      test_station == "MOIV3" ~ stringr::str_extract(file, "_(\\d{2}).\\dC", group = 1),
       .default = stringr::str_extract(file, "_(\\d{2})[.]?\\dC?", group = 1),
     ),
     test_id = dplyr::case_when(
@@ -105,8 +106,9 @@ load_liv = function(file) {
         current = .data$`set_current[mA]`,
         power = .data$`power[mW]`,
         voltage = .data$`voltage[V]`,
-      ) |>
-      dplyr::mutate(mpd_current = NA) # MOIV3 does not have MPD capability?
+        mpd_current = .data$`pd_current[A]`
+      ) #|>
+      # dplyr::mutate(mpd_current = NA) # MOIV3 does not have MPD capability?
 
     # convert to SI units
     df = df |>
