@@ -106,9 +106,9 @@ load_liv = function(file) {
         current = .data$`set_current[mA]`,
         power = .data$`power[mW]`,
         voltage = .data$`voltage[V]`,
-        mpd_current = .data$`pd_current[A]`
-      ) #|>
-      # dplyr::mutate(mpd_current = NA) # MOIV3 does not have MPD capability?
+        # mpd_current = .data$`pd_current[A]`
+      ) |>
+      dplyr::mutate(mpd_current = NA) # MOIV3 does not have MPD capability?
 
     # convert to SI units
     df = df |>
