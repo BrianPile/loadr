@@ -4,7 +4,7 @@
 #'
 #' @returns A single row data frame
 #'
-#' @examples
+# @examples
 
 .osa_get_test_info = function(file) {
 
