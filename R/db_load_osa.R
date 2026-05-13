@@ -72,7 +72,10 @@ db_load_osa_metrics = function(fc_ids = c("26FC00933"), make_unique = FALSE) {
     dplyr::filter(
       .data$fc_id %in% fc_ids
     ) |>
-    dplyr::collect()
+    dplyr::collect() |>
+    mutate(
+      ch = readr::parse_number(ch) + 1
+    )
 
   if (make_unique) {
     df = df |>
