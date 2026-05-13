@@ -13,10 +13,13 @@ Suggests:
 Config/testthat/edition: 3
 Imports: 
     data.table,
+    DBI,
     dplyr,
+    janitor,
     readr,
     readxl,
     rlang,
+    RMariaDB,
     stringr,
     tibble
 URL: https://github.com/BrianPile/loadr

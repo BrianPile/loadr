@@ -4,4 +4,6 @@
 .httr-oauth
 .DS_Store
 .quarto
-dev/
+.positai
+
+/dev/
