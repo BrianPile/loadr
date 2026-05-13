@@ -16,6 +16,7 @@
 #' con <- connect_to_database()
 #' DBI::dbDisconnect(con)
 #' }
+#' @export
 connect_to_database = function() {
   Sys.setenv(MARIADB_TLS_DISABLE_PEER_VERIFICATION = "1")
   con = DBI::dbConnect(

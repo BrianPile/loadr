@@ -73,9 +73,9 @@ db_load_osa_metrics = function(fc_ids = c("26FC00933"), make_unique = FALSE) {
       .data$fc_id %in% fc_ids
     ) |>
     dplyr::collect() |>
-    mutate(
-      ch = readr::parse_number(ch) + 1,
-      temperature = readr::parse_number(temperature)
+    dplyr::mutate(
+      ch = readr::parse_number(.data$ch) + 1,
+      temperature = readr::parse_number(.data$temperature)
     )
 
   if (make_unique) {
