@@ -17,6 +17,7 @@
 #' DBI::dbDisconnect(con)
 #' }
 connect_to_database = function() {
+  Sys.setenv(MARIADB_TLS_DISABLE_PEER_VERIFICATION = "1")
   con = DBI::dbConnect(
     RMariaDB::MariaDB(),
     host = "192.168.10.185",
