@@ -69,7 +69,8 @@ db_load_liv = function(fc_ids = c("26FC00933"), make_unique = FALSE) {
     ) |>
     dplyr::collect() |>
     mutate(
-      ch = readr::parse_number(ch) + 1
+      ch = readr::parse_number(ch) + 1,
+      temperature = readr::parse_number(temperature)
     )
 
   if (make_unique) {
