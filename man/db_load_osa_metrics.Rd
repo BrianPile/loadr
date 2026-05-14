@@ -4,11 +4,14 @@
 \alias{db_load_osa_metrics}
 \title{Load OSA metrics from the Singapore 2026 database table}
 \usage{
-db_load_osa_metrics(fc_ids = c("26FC00933"), make_unique = FALSE)
+db_load_osa_metrics(fc_ids = NULL, work_orders = NULL, make_unique = FALSE)
 }
 \arguments{
-\item{fc_ids}{Character vector of FC IDs to load. Defaults to
-\code{c("26FC00933")}.}
+\item{fc_ids}{Optional character vector of FC IDs to load. If \code{NULL}, no
+filtering by FC ID is applied. Defaults to \code{NULL}.}
+
+\item{work_orders}{Optional character vector of work orders to load. If
+\code{NULL}, no filtering by work order is applied. Defaults to \code{NULL}.}
 
 \item{make_unique}{Logical scalar. If \code{TRUE}, keeps a single representative
 record set per file and per \code{fc_id}/channel/temperature combination. If
@@ -22,9 +25,10 @@ A data frame containing OSA metrics with columns:
 }
 \description{
 Retrieves optical spectrum analyzer (OSA) summary metrics from the
-\code{OSA_SG_2026} database table for one or more FC IDs. The function
-standardizes column names, selects the relevant metadata and OSA metric
-columns, and returns the matching records as a local data frame.
+\code{OSA_SG_2026} database table. Results can optionally be filtered by FC ID
+and/or work order. The function standardizes column names, selects the
+relevant metadata and OSA metric columns, and returns the matching records as
+a local data frame.
 }
 \details{
 When \code{make_unique = TRUE}, duplicate uploads are reduced in two steps:
@@ -49,6 +53,10 @@ using \code{dplyr} before the filtered result is collected into R.
 db_load_osa_metrics()
 
 db_load_osa_metrics(fc_ids = c("26FC00933", "26FC00934"))
+
+db_load_osa_metrics(work_orders = "WO12345")
+
+db_load_osa_metrics(fc_ids = "26FC00933", work_orders = "WO12345")
 
 db_load_osa_metrics(fc_ids = "26FC00933", make_unique = TRUE)
 }

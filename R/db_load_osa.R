@@ -1,17 +1,20 @@
 #' Load OSA metrics from the Singapore 2026 database table
 #'
 #' Retrieves optical spectrum analyzer (OSA) summary metrics from the
-#' `OSA_SG_2026` database table for one or more FC IDs. The function
-#' standardizes column names, selects the relevant metadata and OSA metric
-#' columns, and returns the matching records as a local data frame.
+#' `OSA_SG_2026` database table. Results can optionally be filtered by FC ID
+#' and/or work order. The function standardizes column names, selects the
+#' relevant metadata and OSA metric columns, and returns the matching records as
+#' a local data frame.
 #'
 #' When `make_unique = TRUE`, duplicate uploads are reduced in two steps:
 #' first, only the earliest upload is kept for each unique `file_name`; second,
 #' only the latest upload is kept for each `fc_id`, channel, and temperature
 #' combination.
 #'
-#' @param fc_ids Character vector of FC IDs to load. Defaults to
-#'   `c("26FC00933")`.
+#' @param fc_ids Optional character vector of FC IDs to load. If `NULL`, no
+#'   filtering by FC ID is applied. Defaults to `NULL`.
+#' @param work_orders Optional character vector of work orders to load. If
+#'   `NULL`, no filtering by work order is applied. Defaults to `NULL`.
 #' @param make_unique Logical scalar. If `TRUE`, keeps a single representative
 #'   record set per file and per `fc_id`/channel/temperature combination. If
 #'   `FALSE`, returns all matching records. Defaults to `FALSE`.
@@ -40,11 +43,15 @@
 #'
 #' db_load_osa_metrics(fc_ids = c("26FC00933", "26FC00934"))
 #'
+#' db_load_osa_metrics(work_orders = "WO12345")
+#'
+#' db_load_osa_metrics(fc_ids = "26FC00933", work_orders = "WO12345")
+#'
 #' db_load_osa_metrics(fc_ids = "26FC00933", make_unique = TRUE)
 #' }
 #'
 #' @export
-db_load_osa_metrics = function(fc_ids = c("26FC00933"), make_unique = FALSE) {
+db_load_osa_metrics = function(fc_ids = NULL, work_orders = NULL, make_unique = FALSE) {
 
   con = connect_to_database()
   on.exit(DBI::dbDisconnect(con))
@@ -68,10 +75,17 @@ db_load_osa_metrics = function(fc_ids = c("26FC00933"), make_unique = FALSE) {
       Pp = .data$x1st_peak_power_dbm
     )
 
+  if (!is.null(fc_ids)) {
+    tbl1 = tbl1 |>
+      dplyr::filter(.data$fc_id %in% fc_ids)
+  }
+
+  if (!is.null(work_orders)) {
+    tbl1 = tbl1 |>
+      dplyr::filter(.data$work_order %in% work_orders)
+  }
+
   df = tbl1 |>
-    dplyr::filter(
-      .data$fc_id %in% fc_ids
-    ) |>
     dplyr::collect() |>
     dplyr::mutate(
       ch = readr::parse_number(.data$ch) + 1,
@@ -80,11 +94,11 @@ db_load_osa_metrics = function(fc_ids = c("26FC00933"), make_unique = FALSE) {
 
   if (make_unique) {
     df = df |>
-      dplyr::filter( # for each unique file name, keep the one uploaded first
+      dplyr::filter(
         .by = c(.data$file_name),
         .data$upload_time == dplyr::first(.data$upload_time, order_by = .data$upload_time)
       ) |>
-      dplyr::filter( # for each FC_ID-Channel-temperature combination, keep the last file created
+      dplyr::filter(
         .by = c(.data$fc_id, .data$ch, .data$temperature),
         .data$upload_time == dplyr::last(.data$upload_time, order_by = .data$upload_time)
       )
@@ -93,3 +107,4 @@ db_load_osa_metrics = function(fc_ids = c("26FC00933"), make_unique = FALSE) {
   return(df)
 
 }
+
