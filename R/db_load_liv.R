@@ -84,7 +84,7 @@ db_load_liv = function(fc_ids = NULL, work_orders = NULL, make_unique = FALSE) {
     dplyr::mutate(
       ch = readr::parse_number(.data$ch) +
         dplyr::case_when(
-          .data$work_order %in% c("WO26-0078") ~ 0,
+          .data$work_order %in% c("WO26-0078", "WO26-0119") ~ 0,
           .default = 1
         ),
       temperature = readr::parse_number(.data$temperature)
