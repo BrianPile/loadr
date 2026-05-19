@@ -1,22 +1,26 @@
-#' Connect to the POET MariaDB database
+#' Connect to the POET Database
 #'
-#' Opens a connection to the POET MariaDB database using `DBI::dbConnect()` and
-#' the `RMariaDB` driver.
-#'
-#' @return A MariaDB database connection object of class `MariaDBConnection`.
+#' Establishes a connection to the MariaDB database server used for the POET system.
+#' It temporarily disables TLS peer verification to allow connections to the local/internal server.
 #'
 #' @details
-#' The returned connection should be closed after use with
-#' `DBI::dbDisconnect()`. Functions that call `connect_to_database()` should
-#' typically use `on.exit(DBI::dbDisconnect(con))` to ensure the connection is
-#' closed.
+#' The function sets the environmental variable `MARIADB_TLS_DISABLE_PEER_VERIFICATION = "1"`
+#' before attempting the connection. It connects via specific hardcoded credentials and ports
+#' (`3307`) designated for the internal `poetuser_` schema.
+#'
+#' @return A formal \code{\link[DBI:DBIConnection-class]{DBIConnection}} object
+#'   used to interact with the MariaDB database.
+#'
+#' @seealso \code{\link[DBI]{dbConnect}}, \code{\link[RMariaDB]{MariaDB}}
+#'
+#' @export
 #'
 #' @examples
 #' \dontrun{
 #' con <- connect_to_database()
+#' # Perform database operations...
 #' DBI::dbDisconnect(con)
 #' }
-#' @export
 connect_to_database = function() {
   Sys.setenv(MARIADB_TLS_DISABLE_PEER_VERIFICATION = "1")
   con = DBI::dbConnect(
@@ -30,3 +34,5 @@ connect_to_database = function() {
 
   return(con)
 }
+
+
