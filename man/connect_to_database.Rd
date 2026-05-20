@@ -2,26 +2,30 @@
 % Please edit documentation in R/database.R
 \name{connect_to_database}
 \alias{connect_to_database}
-\title{Connect to the POET MariaDB database}
+\title{Connect to the POET Database}
 \usage{
 connect_to_database()
 }
 \value{
-A MariaDB database connection object of class \code{MariaDBConnection}.
+A formal \code{\link[DBI:DBIConnection-class]{DBIConnection}} object
+used to interact with the MariaDB database.
 }
 \description{
-Opens a connection to the POET MariaDB database using \code{DBI::dbConnect()} and
-the \code{RMariaDB} driver.
+Establishes a connection to the MariaDB database server used for the POET system.
+It temporarily disables TLS peer verification to allow connections to the local/internal server.
 }
 \details{
-The returned connection should be closed after use with
-\code{DBI::dbDisconnect()}. Functions that call \code{connect_to_database()} should
-typically use \code{on.exit(DBI::dbDisconnect(con))} to ensure the connection is
-closed.
+The function sets the environmental variable \code{MARIADB_TLS_DISABLE_PEER_VERIFICATION = "1"}
+before attempting the connection. It connects via specific hardcoded credentials and ports
+(\code{3307}) designated for the internal \code{poetuser_} schema.
 }
 \examples{
 \dontrun{
 con <- connect_to_database()
+# Perform database operations...
 DBI::dbDisconnect(con)
 }
+}
+\seealso{
+\code{\link[DBI]{dbConnect}}, \code{\link[RMariaDB]{MariaDB}}
 }

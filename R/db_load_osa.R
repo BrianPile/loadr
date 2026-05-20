@@ -104,7 +104,7 @@ db_load_osa_metrics = function(fc_ids = NULL, work_orders = NULL, make_unique = 
       ) |>
       dplyr::filter(
         .by = c(.data$fc_id, .data$ch, .data$temperature, .data$If),
-        .data$upload_time == dplyr::last(.data$upload_time, order_by = .data$upload_time)
+        .data$file_created_time == dplyr::last(.data$file_created_time, order_by = .data$file_created_time)
       )
   }
 
