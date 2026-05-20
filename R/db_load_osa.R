@@ -90,7 +90,7 @@ db_load_osa_metrics = function(fc_ids = NULL, work_orders = NULL, make_unique = 
     dplyr::mutate(
       ch = readr::parse_number(.data$ch) +
         dplyr::case_when(
-          .data$work_order %in% c("WO26-0078", "WO26-0119") ~ 0,
+          .data$work_order %in% c("WO26-0078", "WO26-0119", "WO26-0167") ~ 0,
           .default = 1
         ),
       temperature = readr::parse_number(.data$temperature)
