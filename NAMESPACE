@@ -3,6 +3,7 @@
 export(connect_to_database)
 export(db_load_liv)
 export(db_load_osa_metrics)
+export(load_build_log)
 export(load_iv)
 export(load_liv)
 export(load_osa)

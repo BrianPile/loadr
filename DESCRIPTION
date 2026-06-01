@@ -20,7 +20,9 @@ Imports:
     rlang,
     RMariaDB,
     stringr,
-    tibble
+    tibble,
+    tidyr,
+    tidyselect
 URL: https://github.com/BrianPile/loadr
 BugReports: https://github.com/BrianPile/loadr/issues
 Config/roxygen2/version: 8.0.0
