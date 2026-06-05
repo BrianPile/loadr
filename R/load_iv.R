@@ -25,7 +25,7 @@ load_iv = function(file) {
   fc_numeric = stringr::str_remove(fc_id, "^\\d{2}FC") |> readr::parse_number()
   fc_char = sprintf(fmt = "%05d", fc_numeric)
   fc_id = paste0("25FC", fc_char)
-  ch = stringr::str_extract(file, "CH([1-4])", group = 1)
+  ch = stringr::str_extract(file, "CH([1-8])", group = 1)
   # dut_id = paste(sep = "-", fc_id, ch)
   temperature = stringr::str_extract(file, "_(\\d{2})[.]?\\dC?", group = 1)
   test_id = stringr::str_extract(file, "_(\\d{2})_LIV", group = 1)
