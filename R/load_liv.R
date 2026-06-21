@@ -24,6 +24,7 @@
   df_cond = tibble::tibble(
     work_order = stringr::str_extract(file, "WO\\d{2}-\\d{4}"),
     test_station = test_station,
+    file_path_liv = file,
     file_modified_time_liv = fs::file_info(file)$modification_time,
     fc_id = dplyr::case_when(
       test_station == "ETS01" ~ stringr::str_extract(basename(file), "^([^-]+-[^-]+-[^-]+-[^-]+).*[.]csv", group = 1),

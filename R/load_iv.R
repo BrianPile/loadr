@@ -53,6 +53,7 @@ load_iv = function(file) {
     dplyr::mutate(
       work_order = work_order,
       test_station_iv = test_station,
+      file_path_iv = file,
       file_modified_time_iv = fs::file_info(file)$modification_time,
       fc_id = fc_id,
       ch = ch,
