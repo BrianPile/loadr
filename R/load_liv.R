@@ -30,7 +30,7 @@
       test_station == "ETS01" ~ stringr::str_extract(basename(file), "^([^-]+-[^-]+-[^-]+-[^-]+).*[.]csv", group = 1),
       .default = stringr::str_extract(file, "\\d{2}FC\\d{5}")
     ),
-    ch = stringr::str_extract(file, "CH([0-8])", group = 1),
+    ch = stringr::str_extract(file, "CH([0-8])(?!.*CH[0-8])", group = 1), # uses advanced regex technique called "Negative Lookahead". It matches only if there are no other "CH" patterns following it in the string
     temperature = dplyr::case_when(
       test_station == "ETS01" ~ stringr::str_extract(file, "-(\\d{2})[.]?\\d?C-", group = 1),
       test_station == "MOIV3" ~ stringr::str_extract(file, "_(\\d{2}).\\dC", group = 1),
