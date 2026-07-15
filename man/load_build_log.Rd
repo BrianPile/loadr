@@ -4,7 +4,10 @@
 \alias{load_build_log}
 \title{Load the ELS G2 Build List}
 \usage{
-load_build_log(path)
+load_build_log(
+  path =
+    "/Users/brian/Library/CloudStorage/Dropbox-POETTechnologies/Brian Pile/Brian Pile/Documents/ELS Gen2 project repository/test and measurement/assy info/PT11B build log.xlsx"
+)
 }
 \arguments{
 \item{path}{A path to the build log}

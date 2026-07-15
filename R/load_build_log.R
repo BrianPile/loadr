@@ -10,6 +10,7 @@
 #'
 # @examples
 load_build_log = function(path = '/Users/brian/Library/CloudStorage/Dropbox-POETTechnologies/Brian Pile/Brian Pile/Documents/ELS Gen2 project repository/test and measurement/assy info/PT11B build log.xlsx') {
+  message("[loadr] loading build log")
   df_build = readxl::read_xlsx(
     # path = here("../../Documents/ELS Gen2 project repository/test and measurement/assy info/PT11B build log.xlsx"),
     path = path,
