@@ -23,6 +23,14 @@ load_build_log = function(path = '/Users/brian/Library/CloudStorage/Dropbox-POET
       names_prefix = "ld_id_ch"
     ) |>
     dplyr::mutate(ch = as.numeric(.data$ch)) |>
+
+    dplyr::mutate(
+      ch_module = case_when(
+        oe_position == 1 ~ ch,
+        oe_position == 2 ~ ch + 4,
+        .default = NA_real_
+      )
+    ) |>
     tidyr::drop_na(.data$ld_id)
 
   return(df_build)
