@@ -25,7 +25,7 @@ load_build_log = function(path = '/Users/brian/Library/CloudStorage/Dropbox-POET
     dplyr::mutate(ch = as.numeric(.data$ch)) |>
 
     dplyr::mutate(
-      ch_module = case_when(
+      ch_module = dplyr::case_when(
         oe_position == 1 ~ ch,
         oe_position == 2 ~ ch + 4,
         .default = NA_real_
