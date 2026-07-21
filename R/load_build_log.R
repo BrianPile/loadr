@@ -30,8 +30,8 @@ load_build_log = function(path = '/Users/brian/Library/CloudStorage/Dropbox-POET
         oe_position == 2 ~ ch + 4,
         .default = NA_real_
       )
-    ) |>
-    tidyr::drop_na(.data$ld_id)
+    ) #|>
+    #tidyr::drop_na(.data$ld_id)
 
   return(df_build)
 }
