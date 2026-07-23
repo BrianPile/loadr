@@ -104,16 +104,18 @@ load_liv = function(file) {
 
     # select and rename columns
     df = df |>
-      # 1. Select and rename only the columns that are guaranteed to exist
+      # 1. Safely create mpd_current from the original data if it exists
+      dplyr::mutate(
+        mpd_current = if ("pd_current[A]" %in% names(df)) df$`pd_current[A]` else NA_real_
+      ) |>
+      # 2. Select only the final columns you want to keep (this drops pd_current[A])
       dplyr::select(
         current = .data$`set_current[mA]`,
         power = .data$`power[mW]`,
         voltage = .data$`voltage[V]`,
-      ) |>
-      # 2. Safely add and rename pd_current[A] only if it exists in the original data
-      dplyr::mutate(
-        mpd_current = if ("pd_current[A]" %in% names(df)) df$`pd_current[A]` else NA_real_
-      ) # MOIV3 does not have MPD capability?
+        mpd_current
+      )
+
 
     # convert to SI units
     df = df |>
