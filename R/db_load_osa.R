@@ -90,7 +90,19 @@ db_load_osa_metrics = function(fc_ids = NULL, work_orders = NULL, make_unique = 
     dplyr::mutate(
       ch = readr::parse_number(.data$ch) +
         dplyr::case_when(
-          .data$work_order %in% c("WO26-0078", "WO26-0119", "WO26-0167", "WO26-0173", "WO26-0184") ~ 0,
+          .data$work_order %in% c(
+            "WO26-0078",
+            "WO26-0119",
+            "WO26-0167",
+            "WO26-0173",
+            "WO26-0184",
+            "WO26-0188",
+            "WO26-0191",
+            "WO26-0192",
+            "WO26-0193",
+            "WO26-0202",
+            "WO26-0228"
+          ) ~ 0,
           (.data$work_order == "WO26-0056") & (.data$fc_id %in% c("26FC02217", "26FC02218", "26FC02219", "26FC02220", "26FC02221")) ~ 0,
           .default = 1
         ),
